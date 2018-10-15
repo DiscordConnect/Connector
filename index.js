@@ -32,14 +32,14 @@ db.run(
 );
 
 const init = async () => {
-  console.log("Connected to Discord");
+  console.log(client.user.tag + ' Connected!');
 
   await fs.readdir("./commands/", (err, files) => {
     if (err) console.log(err)
     files.forEach(file => {
       if (!file.endsWith(".js")) return;
       cmds[file.split(".")[0]] = require(`./commands/${file}`)
-      console.log(`Loading command ${file}`)
+      console.log(`Loaded: ${file}`)
     });
   });
 };
