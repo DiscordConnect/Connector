@@ -1,6 +1,6 @@
 const humanize = require('time-ago')
 
-exports.run = async (Discord, client, message, args, db, config) => {
+exports.run = async (Discord, client, message, args) => {
   const base_message_url = "https://discordapp.com/channels"
   var user, id
 
@@ -16,9 +16,9 @@ exports.run = async (Discord, client, message, args, db, config) => {
   }
   else return message.reply('**Usage**: lookup [user]')
 
-  await db.all("SELECT * FROM reported_users WHERE reported_user = " + id, function (err, reports) {
+  await client.db.all("SELECT * FROM reported_users WHERE reported_user = " + id, function (err, reports) {
     if (err) return message.reply("An error has occured while processing this command!")
-    var inf = reports.map(r => `[Report ${r.report_id}](${base_message_url}/${config.guild_id}/${r.channel_id}/${r.message_id})`).join("\n")
+    var inf = reports.map(r => `[Report ${r.report_id}](${base_message_url}/${client.config.guild_id}/${r.channel_id}/${r.message_id})`).join("\n")
 
     var embed = new Discord.RichEmbed()
       .setDescription(`**❯ User Information**\nUser: ${user.tag}\nID: ${user.id}\nCreated: ${humanize.ago(user.createdAt)} (${user.createdAt.toUTCString()})\n\n**❯ Infractions**\n${inf ? inf : "No reports have been made on this user."}`)

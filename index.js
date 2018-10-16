@@ -12,6 +12,11 @@ const config = require("./config.json")
 var cmds = {}
 var cooldown = []
 
+client.cmds = cmds
+client.config = config
+client.db = db
+client.cooldown = cooldown
+
 db.run(
   "CREATE TABLE IF NOT EXISTS `reports` (               \
 	`report_id`	INTEGER PRIMARY KEY AUTOINCREMENT,        \
@@ -52,7 +57,7 @@ client.on("message", async message => {
   args.shift();
 
   if (!cmds[command]) return
-  else cmds[command].run(Discord, client, message, args, db, config, cooldown)
+  else cmds[command].run(Discord, client, message, args)
 });
 
 client.on("ready", async => {
@@ -60,3 +65,5 @@ client.on("ready", async => {
 });
 
 client.login(config.token)
+
+client.on('error', console.error)
