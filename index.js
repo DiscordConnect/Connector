@@ -6,6 +6,7 @@ const client = new Discord.Client({
   autoReconnect: true,
   disableEveryone: true
 })
+require("./utils/utils.js")(client);
 const db = new sqlite3.Database("reports.db")
 const config = require("./config.json")
 
