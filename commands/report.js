@@ -28,11 +28,11 @@ exports.run = async (Discord, client, message, args) => {
 
   message.channel.send("✅ Report submitted.");
 
-  cooldown.push(message.author.id);
+  client.cooldown.push(message.author.id);
 
   setTimeout(() => {
-    let index = cooldown.indexOf(message.author.id);
-    if (index > -1) cooldown.splice(index, 1);
+    let index = client.cooldown.indexOf(message.author.id);
+    if (index > -1) client.cooldown.splice(index, 1);
   }, 10000);
 
   client.db.get('SELECT report_id FROM reports ORDER BY report_id DESC', async (err, lastreport) => {
