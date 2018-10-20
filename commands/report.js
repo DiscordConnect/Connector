@@ -37,7 +37,7 @@ exports.run = async (Discord, client, message, args) => {
 
   client.db.get('SELECT report_id FROM reports ORDER BY report_id DESC', async (err, lastreport) => {
     let report_id = lastreport ? parseInt(lastreport.report_id + 1) : 1
-    let msg = await client.channels.get(reportChannel).send("Report **#" + report_id + "**\nReported users: " + users.map(u => `<@${u}> (\`${u}\`) `).join(", ") + "\n\n" + reason + `\n\nConfirmed by ${message.author.tag}`);
+    let msg = await client.channels.get(reportChannel).send("Report **#" + report_id + "**\nReported user(s): " + users.map(u => `<@${u}> (\`${u}\`) `).join(", ") + "\n\n" + reason + `\n\nConfirmed by ${message.author.tag}`);
 
     var stmt = client.db.prepare("INSERT INTO reports (reporter,category,reason,channel_id,message_id,confirmations) VALUES (?,?,?,?,?,?)");
     stmt.run(message.author.id, category.toLowerCase(), reason, reportChannel, msg.id, message.author.tag);
