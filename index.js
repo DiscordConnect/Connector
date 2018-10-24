@@ -7,6 +7,7 @@ const client = new Discord.Client({
   disableEveryone: true
 })
 require("./utils/utils.js")(client);
+require("./utils/db.js")(client);
 const db = new sqlite3.Database("reports.db")
 const config = require("./config.json")
 
@@ -54,11 +55,11 @@ client.on("message", async message => {
   if (!message.content.startsWith(config.prefix)) return
 
   var args = message.content.substring(config.prefix.length).split(/ +/g)
-  var command = args[0].toLowerCase()
-  args.shift();
+  message.args = args.shift();
+  var command = message.args[0].toLowerCase()
 
   if (!cmds[command]) return
-  else cmds[command].run(Discord, client, message, args)
+  else cmds[command].run(Discord, client, message)
 });
 
 client.on("ready", async => {
