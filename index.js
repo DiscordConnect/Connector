@@ -1,42 +1,22 @@
 const Discord = require("discord.js")
 const fs = require("fs")
-const sqlite3 = require("sqlite3")
-
+const db = require("./utils/db.js")
 const client = new Discord.Client({
   autoReconnect: true,
   disableEveryone: true
 })
+
 require("./utils/utils.js")(client);
-require("./utils/db.js")(client);
-const db = new sqlite3.Database("reports.db")
+
 const config = require("./config.json")
 
 var cmds = {}
 var cooldown = []
 
+client.db = db
 client.cmds = cmds
 client.config = config
-client.db = db
 client.cooldown = cooldown
-
-db.run(
-  "CREATE TABLE IF NOT EXISTS `reports` (               \
-	`report_id`	INTEGER PRIMARY KEY AUTOINCREMENT,        \
-	`reporter` TEXT NOT NULL,                             \
-	`category` TEXT NOT NULL,                             \
-	`reason` TEXT NOT NULL,                               \
-	`channel_id` TEXT,                                    \
-	`message_id` TEXT,                                    \
-	`confirmations`	TEXT NOT NULL );"
-);
-
-db.run(
-  "CREATE TABLE IF NOT EXISTS `reported_users` (        \
-  `reported_user` TEXT NOT NULL,                        \
-  `report_id`	INTEGER UNIQUE,                           \
-	`channel_id`	TEXT,                                   \
-	`message_id` TEXT );"
-);
 
 const init = async () => {
   console.log(client.user.tag + ' Connected!');
@@ -52,11 +32,13 @@ const init = async () => {
 };
 
 client.on("message", async message => {
-  if (!message.content.startsWith(config.prefix)) return
+  if (message.author.bot) return
 
-  var args = message.content.substring(config.prefix.length).split(/ +/g)
-  message.args = args.shift();
-  var command = message.args[0].toLowerCase()
+  if (message.content.indexOf(client.config.prefix) !== 0) return
+  
+  var args = message.content.slice(client.config.prefix.length).trim().split(/ +/g)
+  message.args = args
+  var command = args.shift().toLowerCase()
 
   if (!cmds[command]) return
   else cmds[command].run(Discord, client, message)
@@ -65,6 +47,8 @@ client.on("message", async message => {
 client.on("ready", async => {
   init()
 });
+
+//db.connect();
 
 client.login(config.token)
 
