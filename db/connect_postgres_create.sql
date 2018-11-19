@@ -11,7 +11,3 @@ CREATE TABLE IF NOT EXISTS "reports" (
 ) WITH (
   OIDS=FALSE
 );
-
-
-
-

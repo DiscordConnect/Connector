@@ -41,7 +41,7 @@ client.on("message", async message => {
   var command = args.shift().toLowerCase()
 
   if (!cmds[command]) return
-  else cmds[command].run(Discord, client, message)
+  else cmds[command].run(Discord, client, message, args)
 });
 
 client.on("ready", async => {

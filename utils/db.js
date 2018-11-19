@@ -21,7 +21,7 @@ function connect(){
 	 \"channelID\" bigint,                        \
 	 \"messageID\" bigint,                        \
 	 \"reportedUsers\" bigint[],                  \
-	 \"confirmations\" bigint[],                  \
+	 \"confirmations\" TEXT[],                  \
 	 CONSTRAINT reports_pk PRIMARY KEY (\"id\")   \
 	 ) WITH (                                     \
 	   OIDS=FALSE                                 \
@@ -33,24 +33,47 @@ function addReport(reporter, category, reason, reportChannelID, reportMessageID,
     const saveReport = {
         //new format: 
         //reporter, category, reason, channel, message (direct), reported users as array, confirmations as array
-        text: 'INSERT INTO reports(reporter,category,reason,channelID,messageID,reportedUsers,confirmations)'
-        + 'VALUES($1, $2, $3, $4, $5, $6, $7)',
+        text: 'INSERT INTO reports(reporter,category,reason,\"channelID\",\"messageID\",\"reportedUsers\",confirmations)'
+        + ' VALUES($1, $2, $3, $4, $5, $6, $7)',
         values: [reporter, category.toLowerCase(), reason,
         reportChannelID, reportMessageID, reportedUsers, confirmations]
     }
-    
-    //For some reason, my IDE caused a fit until I did these brackets, alright then.
-    console.log(saveReport)
-    connection.query(saveReport)
-      .then(res => {
-        return res
-      })
-      .catch(e => {
-        throw new Error(e)
-      })
+    return new Promise(function(resolve, reject) {
+        connection.query(saveReport, (err, res) => {
+            if (err) reject(err)
+            else resolve(res)
+        })
+    })
+}
+
+function getLastReport() {
+    const lastQuery = {
+        text: 'SELECT id FROM reports ORDER BY id DESC'
+    }
+    return new Promise(function(resolve, reject) {
+        connection.query(lastQuery, (err, res) => {
+            if(err) reject (err)
+            else resolve(res)
+        })
+    })
+}
+
+function getReportByID(reportID) {
+    const lastQuery = {
+        text: 'SELECT * FROM reports WHERE id = $1',
+        values: [reportID]
+    }
+    return new Promise(function(resolve, reject) {
+        connection.query(lastQuery, (err, res) => {
+            if(err) reject (err)
+            else resolve(res)
+        })
+    })
 }
 
 module.exports = {
     connect,
-    addReport
+    addReport,
+    getLastReport,
+    getReportByID
 }

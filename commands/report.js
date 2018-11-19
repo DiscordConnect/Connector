@@ -8,13 +8,10 @@ exports.run = async (Discord, client, message, args) => {
     );
 
   var users = content[0].trim().split(/ +/g).slice(1);
+  //TODO: verify users at least are numbers
   var category = content[1].trim().toLowerCase();
-  var reasonBody = content[2].trim()
-  var reasonStr = reasonBody.trim().replace(URL_REGEX, "")
-  var reason = reasonStr
-  //var proof = reasonBody.replace(URL_REGEX, "<$1>").replace(reasonStr, "").trim()
-  //var reason = reasonStr + proof;
-  console.log(reasonStr)
+  var reason = content[2].trim().replace(URL_REGEX, "<$1>").trim()
+  console.log(reason)
 
   if (!client.config.report_types.includes(category)) 
     return message.channel.send(`**Invalid Category!** Valid categories: \`${client.config.report_types.join(", ")}\``);
@@ -25,29 +22,18 @@ exports.run = async (Discord, client, message, args) => {
   message.attachments.forEach(a => reason += ` ${a.url}`)
 
   let reportChannel = client.config.report_channels[client.config.report_types.indexOf(category)];
-
-  //message.channel.send("Submitting Report!")
-
-  client.cooldown.push(message.author.id);
-
-  setTimeout(() => {
-    let index = client.cooldown.indexOf(message.author.id);
-    if (index > -1) client.cooldown.splice(index, 1);
-  }, 10000);
   
-  //This place is a mess, Delite can handle the impl fuck that
-  client.db.addReport(message.author.id, category, reason, message.channel.id, message.id, users, message.author.tag)
-
-  /*client.db.get('SELECT report_id FROM reports ORDER BY report_id DESC', async (err, lastreport) => {
-    let report_id = lastreport ? parseInt(lastreport.report_id + 1) : 1
-    let msg = await client.channels.get(reportChannel).send("Report **#" + report_id + "**\nReported user(s): " + users.map(u => `<@${u}> (\`${u}\`) `).join(", ") + "\n\n" + reason + `\n\nConfirmed by ${message.author.tag}`);
-
-    var stmt = client.db.prepare("INSERT INTO reports (reporter,category,reason,channel_id,message_id,confirmations) VALUES (?,?,?,?,?,?)");
-    stmt.run(message.author.id, category, reason, reportChannel, msg.id, message.author.tag);
-    stmt.finalize();
-
-    stmt = client.db.prepare("INSERT INTO reported_users (reported_user,report_id,channel_id,message_id) VALUES (?,?,?,?)");
-    users.forEach(u => stmt.run(u, report_id, reportChannel, msg.id))
-    stmt.finalize();
-  })*/
+  client.db.getLastReport().then(async (report) => {
+    const confirmMsg = await message.channel.send('Preparing your report...')
+    let report_id = report.rows[0].id ? parseInt(report.rows[0].id + 1) : 1
+    let reportMsg = await client.channels.get(reportChannel).send(
+      "Report **#" + report_id + "**\nReported user(s): " 
+      + users.map(u => `<@${u}> (\`${u}\`) `).join(", ") + "\n\n"
+      + reason 
+      + `\n\nConfirmed by ${message.author.tag}`);
+      
+    client.db.addReport(message.author.id, category, reason, reportChannel, reportMsg.id, users, [message.author.tag]).then(async (newReport) => {
+      confirmMsg.edit(`Report Processed`)
+    })
+  })
 };
