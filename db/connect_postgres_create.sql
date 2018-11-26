@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS "reports" (
-	"id" bigint NOT NULL DEFAULT '1',
-	"reporter" bigint,
+	"id" TEXT NOT NULL DEFAULT '1',
+	"reporter" TEXT,
 	"category" TEXT,
 	"reason" TEXT,
-	"channelID" bigint,
-	"messageID" bigint,
-	"reportedUsers" bigint[],
-	"confirmations" bigint[],
+	"channelID" TEXT,
+	"messageID" TEXT,
+	"reportedUsers" TEXT[],
+	"confirmations" TEXT[],
 	CONSTRAINT reports_pk PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
