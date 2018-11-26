@@ -79,6 +79,7 @@ function query(rawSQL) {
     const rawQuery = {
         text: rawSQL
     }
+    return connection.query(rawQuery)
 }
 
 module.exports = {
