@@ -7,25 +7,23 @@ var connection = new Client({
     user: config.db.user,
     host: config.db.host,
     database: config.db.database,
-    password: config.db.password
+    password: config.db.password,
+    port: config.db.port
 })
-    
-function connect(){
+
+function connect() {
     connection.connect()
 
     connection.query(
-    "CREATE TABLE IF NOT EXISTS reports(          \
-	 \"id\" TEXT NOT NULL DEFAULT '1',            \
+        "CREATE TABLE IF NOT EXISTS reports(          \
+	 \"id\" SERIAL PRIMARY KEY,               \
      \"reporter\" TEXT,                           \
      \"category\" TEXT,                           \
 	 \"reason\" TEXT,                             \
 	 \"channelID\" TEXT,                          \
 	 \"messageID\" TEXT,                          \
 	 \"reportedUsers\" TEXT[],                    \
-	 \"confirmations\" TEXT[],                    \
-	 CONSTRAINT reports_pk PRIMARY KEY (\"id\")   \
-	 ) WITH (                                     \
-	   OIDS=FALSE                                 \
+	 \"confirmations\" TEXT[]                    \
 	 );"
     );
 }
@@ -33,9 +31,9 @@ function connect(){
 function addReport(reporter, category, reason, reportChannelID, reportMessageID, reportedUsers, confirmations) {
     const saveReport = {
         text: 'INSERT INTO reports(reporter,category,reason,\"channelID\",\"messageID\",\"reportedUsers\",confirmations)'
-        + ' VALUES($1, $2, $3, $4, $5, $6, $7)',
+            + ' VALUES($1, $2, $3, $4, $5, $6, $7)',
         values: [reporter, category.toLowerCase(), reason,
-        reportChannelID, reportMessageID, reportedUsers, confirmations]
+            reportChannelID, reportMessageID, reportedUsers, confirmations]
     }
     return connection.query(saveReport)
 }
@@ -79,6 +77,14 @@ function addConfirm(reportID, msg) {
     })
 }
 
+function getUserReports(userID) {
+    const userReports = {
+        text: 'SELECT * FROM reports WHERE $1=ANY("reportedUsers")',
+        values: [userID]
+    }
+    return connection.query(userReports)
+}
+
 function query(rawSQL) {
     const rawQuery = {
         text: rawSQL
@@ -92,5 +98,6 @@ module.exports = {
     getLastReport,
     getReportByID,
     editReport,
-    addConfirm
+    addConfirm,
+    getUserReports
 }

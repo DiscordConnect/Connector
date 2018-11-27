@@ -35,7 +35,7 @@ client.on("message", async message => {
   if (message.author.bot) return
 
   if (message.content.indexOf(config.prefix) !== 0) return
-  
+
   var args = message.content.slice(config.prefix.length).trim().split(/ +/g)
   message.args = args
   var command = args.shift().toLowerCase()

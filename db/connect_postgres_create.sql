@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS "reports" (
-	"id" TEXT NOT NULL DEFAULT '1',
+	"id" INT NOT NULL DEFAULT '1',
 	"reporter" TEXT,
 	"category" TEXT,
 	"reason" TEXT,

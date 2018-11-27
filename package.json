@@ -6,6 +6,7 @@
   "dependencies": {
     "discord.js": "^11.4.2",
     "pg": "^7.5.0",
+    "pg-promise": "^8.5.2",
     "time-ago": "^0.2.1"
   },
   "devDependencies": {},
