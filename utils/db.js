@@ -55,20 +55,24 @@ function getReportByID(reportID) {
     return connection.query(lastQuery)
 }
 
-function editReport(reportID, field, newData) {
-    const editReportQuery = {
-        text: 'UPDATE reports SET ' + field + ' = $1 WHERE id = $2 RETURNING *',
-        values: [newData, reportID]
-    }
-    return connection.query(editReportQuery)
+function editReport(reportID, field, newData, msg) {
+    getReportByID(reportID).then(async (report) => {
+        if (report.reporter != msg.author.id) return "You can only edit your own reports."
+        const editReportQuery = {
+            text: 'UPDATE reports SET ' + field + ' = $1 WHERE id = $2 RETURNING *',
+            values: [newData, reportID]
+        }
+        return connection.query(editReportQuery)
+    })
 }
 
-function addConfirm(reportID, field, newUser) {
+function addConfirm(reportID, msg) {
     getReportByID(reportID).then(async (report) => {
-        if (report.rows[0].confirmations.contains(newUser)) return false
-        let confirms = report.rows[0].confirmations.push(newUser)
+        let confirmations = report.rows[0].confirmations
+        if (confirmations.contains(msg.author)) return "You\'ve already confirmed that report!"
+        let confirms = confirmations.push(msg.author.tag)
         const postNewConfirm = {
-            text: 'UPDATE reports SET confirmations = $1 FROM reports WHERE id = $2',
+            text: 'UPDATE reports SET confirmations = $1 FROM reports WHERE id = $2 RETURNING *',
             values: [confirms, reportID]
         }
         return connection.query(postNewConfirm)
