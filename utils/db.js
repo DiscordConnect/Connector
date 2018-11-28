@@ -53,12 +53,12 @@ function getReportByID(reportID) {
     return connection.query(lastQuery)
 }
 
-function editReport(reportID, field, newData, msg) {
+function editReport(reportID, newData, msg) {
     getReportByID(reportID).then(async (report) => {
         if (report.reporter != msg.author.id) return "You can only edit your own reports."
         const editReportQuery = {
-            text: 'UPDATE reports SET ' + field + ' = $1 WHERE id = $2 RETURNING *',
-            values: [newData, reportID]
+            text: 'UPDATE reports SET report = $2 WHERE id = $1 RETURNING *',
+            values: [reportID, newData]
         }
         return connection.query(editReportQuery)
     })

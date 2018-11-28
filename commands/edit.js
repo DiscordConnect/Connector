@@ -3,7 +3,7 @@ exports.run = async (Discord, client, message, args) => {
   let reason = args.slice(1).join(" ")
   if (!reportID || isNaN(reportID) || !reason) return message.reply("**Usage:** edit [report id] [new reason,proof]")
 
-  client.db.editReport(reportID, 'reason', reason, message).then(async (rawReport) => {
+  client.db.editReport(reportID, reason, message).then(async (rawReport) => {
     let report = rawReport.rows[0]
     let msg = await client.channels.get(report.channelID).fetchMessage(report.messageID)
 
