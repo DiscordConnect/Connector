@@ -5,4 +5,4 @@ exports.run = async (Discord, client, message, args) => {
     `\n\`${client.config.prefix}lookup\` - Lookup a user by their ID or mention.` +
     `\n\`${client.config.prefix}confirm\` - Confirm an existing report.` +
     `\n\`${client.config.prefix}help\` - This message, that you're reading, right now.`)
-};
+}

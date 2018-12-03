@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "discord.js": "^11.4.2",
-    "sqlite3": "^4.0.2",
+    "pg": "^7.5.0",
     "time-ago": "^0.2.1"
   },
   "devDependencies": {},
